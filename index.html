@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Apocalyptic OS</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+  <div id="flicker-layer"></div>
+
+  <audio id="boot-beep" src="assets/boot-beep.mp3" preload="auto"></audio>
+  <audio id="mac-chime" src="assets/mac-chime.mp3" preload="auto"></audio>
+
+  <!-- Start Overlay -->
+  <div id="start-overlay">
+    <button id="start-button">START SYSTEM</button>
+  </div>
+
+  <!-- Drag-and-Drop CAPTCHA (initially hidden) -->
+  <div id="captcha-container" class="hidden">
+    <img src="assets/open_bg.jpg" alt="CAPTCHA Background" class="captcha-bg" />
+    <p class="captcha-instruction">!!ALERT!! CAPTCHA the runaway Zuckerb0rg to proceed.</p>
+    <div class="captcha-images">
+      <img id="draggable-zuck" src="assets/zuck.png" alt="Zuckerberg Roomba" draggable="true" />
+      <div id="drop-target">
+        <img src="assets/bank.png" alt="Charging Station" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 1: Mac Boot Screen -->
+  <div id="boot-screen" class="fade">
+    <div id="boot-blackout"></div>
+  </div>
+
+  <!-- Phase 2: CRT QR Reveal -->
+  <div id="crt-ui" class="fade hidden">
+    <img id="crt-bg" src="assets/bg_crt.jpg" alt="CRT background" />
+  </div>
+
+  <!-- Phase 3: QR Section -->
+  <div id="qr-container" class="hidden">
+    <h2>Join the waitlist for <p>POST APOCALYPTIC SAN FRANCISCO.</p></h2>
+    <div>
+      <img src="assets/qr.jpg" alt="Venmo QR Code" />
+    </div>
+    <a href="https://venmo.com/?txn=pay&recipients=paizley-lee&amount=1&note=Post%20Apocalyptic%20SF%20@INSERT_IG_HANDLE" target="_blank" class="venmo-button">
+      SCAN 2 JOIN WAITLIST
+      </a>
+    <p>
+        For EXACTLY $1 AND WHATEVER PROCESSING FEE, you can keep the tech overlords underground.
+        <br />
+  </div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

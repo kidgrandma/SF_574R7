@@ -7,11 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const background = document.getElementById('crt-bg');
     const qrContainer = document.getElementById('qr-container');
     const crtUI = document.getElementById('crt-ui');
-    const glenMusic = new Audio('assets/glenim.mp3');
+    const glenMusic = new Audio('assets/humanzuck.mp3');
 
     let crtVisible = false;
     let backgroundReady = false;
     let qrShown = false;
+    let animationInterval;
 
     qrContainer.classList.add('hidden');
 
@@ -19,51 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const draggable = document.getElementById('draggable-zuck');
     const dropZone = document.getElementById('drop-target');
 
-    // Bouncing logic for draggable
-    let dx = 2;
-    let dy = 2;
-    let posX = 100;
-    let posY = 100;
-    let animationInterval;
-
-    function startBouncing() {
-        draggable.style.position = 'absolute';
-        // Add scale variables
-        let scaleDirection = 1;
-        let scale = 1;
-        draggable.style.left = `${posX}px`;
-        draggable.style.top = `${posY}px`;
-        animationInterval = setInterval(() => {
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-            const elementWidth = draggable.offsetWidth;
-            const elementHeight = draggable.offsetHeight;
-
-            posX += dx * 0.5;
-            posY += dy * 0.5;
-
-            if (posX + elementWidth >= screenWidth || posX <= 0) {
-                dx = -dx;
-            }
-            if (posY + elementHeight >= screenHeight || posY <= 0) {
-                dy = -dy;
-            }
-
-            draggable.style.left = `${posX}px`;
-            draggable.style.top = `${posY}px`;
-
-            // Scale animation
-            scale += 0.005 * scaleDirection;
-            if (scale >= 1.2 || scale <= 0.8) {
-                scaleDirection *= -1;
-            }
-            draggable.style.transform = `scale(${scale})`;
-        }, 16);
-    }
+    draggable.style.backgroundColor = '#fff';
 
     draggable.addEventListener('dragstart', (e) => {
         clearInterval(animationInterval);
+        draggable.classList.add('dragging');
         e.dataTransfer.setData('text/plain', 'zuck');
+        // Let browser handle default drag image
     });
 
     dropZone.addEventListener('dragover', (e) => {
@@ -75,41 +38,69 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.style.backgroundColor = '';
     });
 
-    dropZone.addEventListener('drop', (e) => {
+    document.addEventListener('dragover', (e) => {
+        e.preventDefault(); // REQUIRED to allow drop event to fire on document
+    });
+
+    document.addEventListener('drop', (e) => {
         e.preventDefault();
-        const successMessage = document.createElement('p');
-        successMessage.textContent = '✅ Zuckerberg successfully docked.';
-        successMessage.classList.add('success-msg');
-        successMessage.style.fontFamily = "'Geneva', 'Lucida Grande', sans-serif";
-        successMessage.style.fontSize = '20px';
-        successMessage.style.color = '#000';
-        successMessage.style.backgroundColor = '#fff';
-        successMessage.style.padding = '8px 12px';
-        successMessage.style.border = '2px solid #000';
-        successMessage.style.borderRadius = '4px';
-        successMessage.style.position = 'absolute';
-        successMessage.style.zIndex = '9999';
-        successMessage.style.left = `${e.clientX}px`;
-        successMessage.style.top = `${e.clientY}px`;
-        document.body.appendChild(successMessage);
-        document.getElementById('captcha-container').style.display = 'none';
 
-        bootBeep.load();
-        bootBeep.play().catch(() => {
-            console.warn('Boot beep blocked.');
-        });
+        const isInside = dropZone.contains(e.target);
 
-        setTimeout(() => {
-            bootScreen.style.display = 'none';
-            crtUI.classList.remove('hidden');
-            crtUI.classList.add('fade-in');
+        if (isInside) {
+            const successMessage = document.createElement('p');
+            successMessage.textContent = '✅ Zuckerberg successfully docked.';
+            successMessage.classList.add('success-msg');
+            successMessage.style.fontFamily = "'Geneva', 'Lucida Grande', sans-serif";
+            successMessage.style.fontSize = '20px';
+            successMessage.style.color = '#000';
+            successMessage.style.backgroundColor = '#fff';
+            successMessage.style.padding = '8px 12px';
+            successMessage.style.border = '2px solid #000';
+            successMessage.style.borderRadius = '4px';
+            successMessage.style.position = 'absolute';
+            successMessage.style.zIndex = '9999';
+            successMessage.style.left = `${e.clientX}px`;
+            successMessage.style.top = `${e.clientY}px`;
+            document.body.appendChild(successMessage);
+            document.getElementById('captcha-container').style.display = 'none';
 
-            setTimeout(maybeShowQR, 100);
+            bootBeep.load();
+            bootBeep.play().catch(() => {
+                console.warn('Boot beep blocked.');
+            });
 
-            crtVisible = true;
-            backgroundReady = true;
-            maybeShowQR();
-        }, 1000);
+            draggable.classList.remove('dragging');
+            dropZone.classList.add('closed');
+
+            setTimeout(() => {
+                bootScreen.style.display = 'none';
+                crtUI.classList.remove('hidden');
+                crtUI.classList.add('fade-in');
+
+                setTimeout(maybeShowQR, 100);
+
+                crtVisible = true;
+                backgroundReady = true;
+                maybeShowQR();
+            }, 1000);
+        } else {
+            dropZone.style.backgroundColor = '';
+            draggable.classList.remove('dragging');
+            draggable.classList.add('fail-drop');
+            setTimeout(() => {
+                draggable.classList.remove('fail-drop');
+            }, 400);
+            draggable.style.cursor = 'grab';
+            draggable.style.position = 'absolute';
+            draggable.style.left = `${e.clientX - draggable.offsetWidth / 2}px`;
+            draggable.style.top = `${e.clientY - draggable.offsetHeight / 2}px`;
+
+            dropZone.style.outline = '7px solid #e66';
+            setTimeout(() => {
+                dropZone.style.outline = '';
+            }, 600);
+        }
     });
 
     // Mobile touch support for drag-and-drop
@@ -118,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let successMessage;
 
     draggable.addEventListener('touchstart', (e) => {
+        e.preventDefault();
         clearInterval(animationInterval);
         const touch = e.touches[0];
         const rect = draggable.getBoundingClientRect();
@@ -126,9 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         draggable.style.position = 'absolute';
         draggable.style.zIndex = 1000;
-    });
+        draggable.classList.add('dragging');
+    }, { passive: false });
 
     draggable.addEventListener('touchmove', (e) => {
+        e.preventDefault();
         const touch = e.touches[0];
         draggable.style.left = `${touch.clientX - touchOffsetX}px`;
         draggable.style.top = `${touch.clientY - touchOffsetY}px`;
@@ -146,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             dropZone.style.backgroundColor = '';
         }
-    });
+    }, { passive: false });
 
     draggable.addEventListener('touchend', (e) => {
         const dropRect = dropZone.getBoundingClientRect();
@@ -193,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 maybeShowQR();
             }, 1000);
         }
+        draggable.classList.remove('dragging');
         dropZone.style.backgroundColor = '';
         setTimeout(() => {
             if (successMessage && successMessage.parentNode) {
@@ -242,8 +237,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 qrContainer.classList.remove('hidden');
                 qrContainer.classList.add('fade-in');
 
+                // Create and insert the countdown timer element
+                let countdown = document.getElementById('qr-countdown');
+                if (!countdown) {
+                    countdown = document.createElement('div');
+                    countdown.id = 'qr-countdown';
+                    qrContainer.appendChild(countdown);
+                }
+
+                function updateCountdown() {
+                    const now = new Date();
+                    const target = new Date('2025-06-12T00:00:00-07:00'); // June 12 PST
+                    const diff = target - now;
+
+                    if (diff <= 0) {
+                        countdown.textContent = '🚪 Portal is open!';
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                    const seconds = Math.floor((diff / 1000) % 60);
+
+                    countdown.textContent = `⏳ Portal opens in ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+
                 qrShown = true;
             }, 2000);
         }
+    }
+
+    function startBouncing() {
+        const zuck = document.getElementById('draggable-zuck');
+        const container = document.getElementById('captcha-container');
+
+        let posX = 100;
+        let posY = 100;
+        let dx = 2;
+        let dy = 2;
+
+        container.style.position = 'relative';
+        zuck.style.position = 'absolute';
+        container.appendChild(zuck);
+
+        animationInterval = setInterval(() => {
+            const zuckWidth = zuck.offsetWidth;
+            const zuckHeight = zuck.offsetHeight;
+            const maxX = container.clientWidth - zuckWidth;
+            const maxY = container.clientHeight - zuckHeight;
+
+            posX += dx;
+            posY += dy;
+
+            if (posX <= 0 || posX >= maxX) {
+                dx = -dx;
+                posX = Math.max(0, Math.min(posX, maxX));
+            }
+            if (posY <= 0 || posY >= maxY) {
+                dy = -dy;
+                posY = Math.max(0, Math.min(posY, maxY));
+            }
+
+            zuck.style.left = posX + 'px';
+            zuck.style.top = posY + 'px';
+        }, 20);
     }
 });

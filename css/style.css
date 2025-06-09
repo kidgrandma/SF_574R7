@@ -81,6 +81,19 @@ html, body {
   z-index: 10001;
 }
 
+#qr-countdown {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  font-family: 'Chicago', 'Geneva', sans-serif;
+  background-color: #fff;
+  color: #000;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #999;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 #333;
+  opacity: 0.9;
+}
+
 #qr-container h2 {
   font-size: 1.15rem;
   margin-bottom: 1rem;
@@ -202,35 +215,8 @@ html, body {
   z-index: 2;
 }
 
-@keyframes explodeClone {
-  0% {
-    transform: scale(1) translate(0, 0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.5) translate(var(--tx), var(--ty));
-    opacity: 0;
-  }
-}
-
-.start-clone {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: fit-content;
-  padding: 0.6rem 1.2rem;
-  background-color: #e0e0e0;
-  color: #000;
-  border: 1px solid #aaa;
-  font-size: 1.1rem;
-  font-family: 'Geneva', 'Lucida Grande', sans-serif;
-  pointer-events: none;
-  animation: explodeClone 1s forwards;
-  transform: translate(-50%, -50%);
-}
-
 #start-button:hover {
-  background-color: #d0d0d0;
+  background-color: #00e969;
 }
 
 #background {
@@ -257,6 +243,30 @@ html, body {
   }
   #qr-container img {
     width: 120px;
+  }
+  #draggable-zuck {
+    transition: transform 0.3s ease;
+    width: 140px;
+    max-width: none;
+    height: auto;
+    cursor: move;
+    background-color: transparent;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    padding: 0;
+  }
+  #draggable-zuck.fail-drop {
+    background-color: #fdd;
+    border-color: #e66;
+    border-width: 10px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  #drop-target.fail-highlight {
+    border-color: #e66;
+    background-color: #fdd;
+    box-shadow: 0 0 0 2px #e66;
   }
 }
 @keyframes bootFlash {
@@ -290,18 +300,31 @@ html, body {
   animation: bootFlash 1s ease-in-out forwards;
 }
 
-
-/* --- CAPTCHA Interaction Styles --- */
-#captcha-container {
-  position: fixed;
+.captcha-bg {
+  position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/assets/open_bg.jpg') no-repeat center center;
+  background-size: cover;
+  z-index: 0;
+}
+
+#captcha-container .captcha-bg {
+  /* intentionally left blank or overridden by .captcha-bg above */
+}
+
+#captcha-container > *:not(.captcha-bg) {
+  position: relative;
+  z-index: 1;
+}
+/* --- CAPTCHA Interaction Styles --- */
+#captcha-container {
+  position: relative;
   width: 100vw;
   height: 100vh;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -312,18 +335,45 @@ html, body {
   padding: 2rem 1rem;
   box-sizing: border-box;
   text-align: center;
+  z-index: 9999;
 }
 
-#drag-instructions {
+#countdown-timer {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 1.25rem;
+  font-family: 'Chicago', 'Geneva', sans-serif;
+  background-color: #fff;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border: 2px solid #999;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #333;
+  z-index: 10;
+  opacity: 0.85;
+}
+
+#drag-instructions-container {
   margin-bottom: 1.5rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   text-align: center;
   font-family: 'Chicago', 'Geneva', sans-serif;
-  color: #555;
-  padding: 0 1rem;
-  max-width: 90%;
+  background-color: #b7b7b7;
+  border: 2px solid #888;
+  border-radius: 4px;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #aaa;
+  color: #111;
+  padding: 0.75rem 1rem;
+  max-width: 80%;
+  line-height: 1.4;
+  font-weight: 5px;
+  animation: instructionPulse 2s ease-in-out infinite;
 }
-
+@keyframes instructionPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
 /* Remove #draggable and #drop-zone styles (replaced by #draggable-zuck and #drop-target) */
 
 .captcha-images {
@@ -331,24 +381,24 @@ html, body {
   gap: 2rem;
   align-items: center;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: 10rem;
   flex-wrap: wrap;
 }
 
 #draggable-zuck {
-  width: 80px;
+  transition: transform 0.3s ease;
+  width: 140px;
+  max-width: none;
   height: auto;
-  cursor: grab;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  /* Removed glow and shadow effects */
-  animation: floatScale 4s ease-in-out infinite, screensaverWiggle 8s ease-in-out infinite;
+  cursor: move;
+  background-color: transparent;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: 0;
 }
 
-@keyframes floatScale {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
+
 #captcha-container h1 {
   font-family: 'Chicago', 'Geneva', sans-serif;
   font-size: 1.25rem;
@@ -367,21 +417,30 @@ html, body {
   z-index: 0;
 }
 
-#drop-target img {
-  width: 100px;
+#drop-target {
+  display: inline-block;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+  background: none;
+  padding: 0;
+  width: auto;
   height: auto;
+  transform: scale(1.4);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background-color: #eee;
+  animation: softPulse 2s ease-in-out infinite;
+  position: relative;
 }
 
-#drop-target {
-  width: 100px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed #aaa;
-  border-radius: 6px;
-  background-color: #f5f5f5;
-  padding: 0.5rem;
+#drop-target img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+#drop-target.closed img {
+  content: url('/assets/closetrash.png');
 }
 
 @keyframes dropPop {
@@ -428,7 +487,7 @@ html, body {
 
 @media (max-width: 430px) {
   #captcha-container {
-    padding: 1.5rem 1rem;
+    padding: 6rem 1rem;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
@@ -438,18 +497,49 @@ html, body {
     flex-direction: column;
     gap: 1.5rem;
   }
-
+#drag-instructions-container {
+    font-size: 0.9rem;
+    padding: 1rem 0.75rem;
+    max-width: 90%;
+    margin-bottom: 10rem;
+    background-color: #b7b7b7;
+    border: 2px solid #888;
+    border-radius: 4px;
+    box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #aaa;
+    color: #111;
+    font-weight: bold;
+    animation: instructionPulse 2s ease-in-out infinite;
+}
   #draggable-zuck {
-    width: 64px;
+    transition: transform 0.3s ease;
+    width: 140px;
+    max-width: none;
+    height: auto;
+    cursor: move;
+    background-color: transparent;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    padding: 0;
   }
 
   #drop-target {
-    width: 80px;
-    height: 80px;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background-color: #eee;
+    padding: 0;
+    transform: scale(1.4);
   }
 
   #drop-target img {
-    width: 80px;
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
   }
 
   #drag-instructions {
@@ -462,23 +552,58 @@ html, body {
   #captcha-container h1 {
     font-size: 1.1rem;
   }
+
+  #countdown-timer {
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@keyframes zuckDrift {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  25%  { transform: translate(20px, -10px) scale(1.05); }
+  50%  { transform: translate(-15px, 15px) scale(0.98); }
+  75%  { transform: translate(10px, -5px) scale(1.03); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
 
 
-@keyframes screensaverWiggle {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  25% {
-    transform: translate(15px, -10px) scale(1.05);
-  }
-  50% {
-    transform: translate(-10px, 15px) scale(0.95);
-  }
-  75% {
-    transform: translate(10px, 10px) scale(1.1);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+@keyframes softPulse {
+  0%, 100% { box-shadow: 0 0 0 transparent; }
+  50% { box-shadow: 0 0 6px rgba(180,180,180,0.4); }
+}
+
+.drop-label {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #eee;
+  border: 1px solid #999;
+  padding: 4px 8px;
+  font-family: 'Chicago', 'Geneva', sans-serif;
+  font-size: 0.8rem;
+  color: #222;
+  box-shadow: 2px 2px 0 #999;
+  z-index: 10;
+  pointer-events: none;
+}
+#draggable-zuck.dragging {
+  transform: rotate(-4deg) scale(1.15);
+  opacity: 0.92;
+  box-shadow: 4px 4px 0 #333;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+#draggable-zuck.fail-drop {
+  background-color: #fdd;
+  border-color: #e66;
+  border-width: 10px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+#drop-target.fail-highlight {
+  outline: 2px dashed #f66;
+  animation: shakeFail 0.3s ease-in-out;
 }

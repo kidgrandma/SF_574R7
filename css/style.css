@@ -10,7 +10,6 @@ html, body {
   font-family: 'VT323', monospace;
   overflow: hidden;
 }
-
 .cursor {
   animation: pulse 1.5s ease-in-out infinite;
 }
@@ -310,11 +309,6 @@ html, body {
   background-size: cover;
   z-index: 0;
 }
-
-#captcha-container .captcha-bg {
-  /* intentionally left blank or overridden by .captcha-bg above */
-}
-
 #captcha-container > *:not(.captcha-bg) {
   position: relative;
   z-index: 1;

@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const background = document.getElementById('crt-bg');
     const qrContainer = document.getElementById('qr-container');
     const crtUI = document.getElementById('crt-ui');
-    const glenMusic = new Audio('assets/humanzuck.mp3');
+    const glenMusic = new Audio('./assets/humanzuck.mp3'); // Ensure the path is relative to the script
+    glenMusic.addEventListener('error', () => {
+        console.error('Failed to load glenMusic audio file. Please check the file path.');
+    });
 
     let crtVisible = false;
     let backgroundReady = false;
@@ -69,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
             bootBeep.play().catch(() => {
                 console.warn('Boot beep blocked.');
             });
+
+            glenMusic.pause();
+            glenMusic.currentTime = 0;
 
             draggable.classList.remove('dragging');
             dropZone.classList.add('closed');
@@ -175,6 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Boot beep blocked.');
             });
 
+            glenMusic.pause();
+            glenMusic.currentTime = 0;
+
             setTimeout(() => {
                 bootScreen.style.display = 'none';
                 crtUI.classList.remove('hidden');
@@ -219,9 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2000);
         }
         startOverlay.style.display = 'none';
-        glenMusic.play().catch(() => {
-            console.warn('Glen music blocked.');
-        });
+
+        if (glenMusic.paused) {
+            glenMusic.play().catch(() => {
+                console.warn('Glen music blocked.');
+            });
+        }
+
         document.getElementById('captcha-container').classList.remove('hidden');
         startBouncing();
     });
@@ -247,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 function updateCountdown() {
                     const now = new Date();
-                    const target = new Date('2025-06-12T00:00:00-07:00'); // June 12 PST
+                    const target = new Date('2025-06-13T00:00:00-07:00'); 
                     const diff = target - now;
 
                     if (diff <= 0) {

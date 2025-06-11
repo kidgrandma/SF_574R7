@@ -2,13 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Post Apocalyptic OS</title>
-  <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+  <style>
+    /* Critical inline styles to prevent FOUC */
+    body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+    .hidden { display: none !important; }
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- Scanlines and flicker effects -->
+  <div id="scanlines"></div>
+  <div id="flicker"></div>
+
+  <!-- Preload critical audio -->
   <audio id="boot-beep" src="assets/boot-beep.mp3" preload="auto"></audio>
   <audio id="mac-chime" src="assets/mac-chime.mp3" preload="auto"></audio>
 
@@ -17,9 +27,9 @@
     <button id="start-button">START SYSTEM</button>
   </div>
 
-  <!-- Drag-and-Drop CAPTCHA (initially hidden) -->
+  <!-- Drag-and-Drop CAPTCHA -->
   <div id="captcha-container" class="hidden">
-    <img src="assets/open_bg.jpg" alt="CAPTCHA Background" class="captcha-bg" />
+    <div class="captcha-bg"></div>
     <div id="drag-instructions-container">
       <p class="drag-instructions">🚨🆘 CAPTCHA Zuckb0rg to proceed 🔔🔊</p>
     </div>
@@ -32,29 +42,55 @@
   </div>
 
   <!-- Phase 1: Mac Boot Screen -->
-  <div id="boot-screen" class="fade">
+  <div id="boot-screen">
     <div id="boot-blackout"></div>
   </div>
 
-  <!-- Phase 2: CRT QR Reveal -->
-  <div id="crt-ui" class="fade hidden">
+  <!-- Phase 2: CRT Background -->
+  <div id="crt-bg-container" class="hidden">
     <img id="crt-bg" src="assets/bg_crt.jpg" alt="CRT background" />
   </div>
 
-  <!-- Phase 3: QR Section -->
+  <!-- Phase 3: QR Section with BUDDY Icons -->
   <div id="qr-container" class="hidden">
-    <h2>Join the waitlist for <p>POST APOCALYPTIC SAN FRANCISCO.</p></h2>
-    <div>
-      <img src="assets/qr.jpg" alt="Venmo QR Code" />
+    <div class="qr-header">
+      <h2>POST APOCALYPTIC: SAN FRANCISCO</h2>
+      <p>A live experiment in behavior, identity, and social logic.</p>
+      <p><strong>Explore to join the waitlist.</strong></p>
     </div>
-    <a href="https://venmo.com/?txn=pay&recipients=worksucksdotnet&amount=1&note=Post%20Apocalyptic%20SF%20@INSERT_IG_HANDLE" target="_blank" class="venmo-button">
-      SCAN 2 JOIN WAITLIST
-      </a>
-    <p>
-        For EXACTLY $1 AND WHATEVER PROCESSING FEE, you can keep the tech overlords underground.
-        <br />
+
+    <div class="qr-body">
+      <div id="buddy-folder-ui" class="aim-icon-grid-inside hidden">
+        <button class="buddy-icon" data-window="info">
+          <img src="assets/bud-info.gif" alt="Info" />
+        </button>
+        <button class="buddy-icon" data-window="online">
+          <img src="assets/bud-online.gif" alt="Online" />
+        </button>
+        <button class="buddy-icon" data-window="special">
+          <img src="assets/bud-special.gif" alt="Special" />
+        </button>
+        <button class="buddy-icon" data-window="hot">
+          <img src="assets/bud-hot.gif" alt="Hot" />
+        </button>
+        <button class="buddy-icon" data-window="adhd">
+          <img src="assets/bud-adhd.gif" alt="ADHD" />
+        </button>
+        <button class="buddy-icon" data-window="pissed">
+          <img src="assets/bud-pissed.gif" alt="Pissed" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Countdown timer will be inserted here by JS -->
   </div>
 
-<script src="js/main.js"></script>
+  <!-- Dynamic Pop-up Windows -->
+  <div id="buddy-windows"></div>
+
+  <!-- Boot flash effect -->
+  <div id="boot-flash"></div>
+
+  <script src="js/main.js"></script>
 </body>
 </html>

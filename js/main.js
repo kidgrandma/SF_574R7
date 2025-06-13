@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         function updateCountdown() {
             const now = new Date();
-            const target = new Date('2025-06-13T00:00:00-07:00');
+            const target = new Date('2025-06-20T00:00:00-07:00');
             const diff = target - now;
             
             if (diff <= 0) {
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         function updateLiveCountdown() {
             const now = new Date();
-            const target = new Date('2025-06-20T00:00:00-07:00');
+            const target = new Date('2025-06-26T00:00:00-07:00');
             const diff = target - now;
             
             if (diff <= 0) {

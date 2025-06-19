@@ -842,7 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3>POST APOCALYPTIC: SAN FRANCISCO</h3>
                     <p>A live experiment in behavior, identity, and social logic.</p>
                     <p>No skill required. Play from anywhere. Not an RPG..it's cooler <img src="./assets/smile.gif" alt="smile" class="inline-emoji" onerror="this.style.display='none';" /></p>
-                    <p><strong>You can join the waitlist for the price of an Arizona Iced Tea (.99 cents!) <img src="./assets/coin.gif" alt="coin" class="inline-emoji" onerror="this.style.display='none';" /></strong></p>
+                    <p><strong>Buy the moderator an Arizona Iced Tea (.99 cents!) <img src="./assets/coin.gif" alt="coin" class="inline-emoji" onerror="this.style.display='none';" /></strong></p>
                     <img src="./assets/qr.jpg" alt="QR Code" class="qr-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
                     <div style="display:none; padding:20px; border:1px solid #ccc; text-align:center;">QR Code failed to load</div>
                     <p><a href="https://venmo.com/?txn=pay&recipients=worksucksdotnet&amount=1&note=Post%20Apocalyptic%20SF%20@INSERT_IG_HANDLE" target="_blank">Scan QR or Click Here to join waitlist</a></p>
